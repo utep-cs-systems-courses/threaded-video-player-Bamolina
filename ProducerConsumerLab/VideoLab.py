@@ -9,7 +9,7 @@ class Queue():
     def __init__(self):
         self.queue = []
         self.lock = threading.Lock()
-        self.front = threading.Semaphore(23)
+        self.front = threading.Semaphore(24)
         self.rear = threading.Semaphore(0)
 
     # front and rear will be used to keep track of the capacity
