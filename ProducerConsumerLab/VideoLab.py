@@ -9,7 +9,7 @@ class Queue():
     def __init__(self):
         self.queue = []
         self.lock = threading.Lock()
-        self.front = threading.Semaphore(23)
+        self.front = threading.Semaphore(24)
         self.rear = threading.Semaphore(0)
 
     # front and rear will be used to keep track of the capacity
@@ -26,6 +26,7 @@ class Queue():
         item = self.queue.pop(0)
         self.lock.release()
         self.front.release()
+        return item
 
 # based on extract frames demo
 def extractFrames(fileName, queue):
@@ -50,22 +51,24 @@ def extractFrames(fileName, queue):
 
 # based on convert to grayscale demo
 def convertToGrayscale(colorFrames, grayFrames):
+    if colorFrames is None:
+        raise TypeError
+    if grayFrames is None:
+        raise TypeError
     # initialize frame count
     count = 0
     colorFrame = colorFrames.dequeue()
-
-    # Iterate through frames
+    # iterate through frames
     while colorFrame is not EOF:
         print(f'Converting frame {count}')
 
         # Convert the image to grayscale_
-        grayFrame = cv2.cvtColor(colorFrame, cv2.COLOR_BGR2GRAY)
-
+        grayFrame = cv2.cvtColor(colorFrame, cv2.COLOR_BGR2GRAY) # colorFrame might be None
         grayFrames.enqueue(grayFrame)
-
         count += 1
-
         colorFrame = colorFrames.dequeue()
+
+    grayFrames.enqueue(EOF)
 
 # based on display frames demo
 def displayFrames(frames):
@@ -85,7 +88,7 @@ def displayFrames(frames):
         count += 1
 
         # Next frame from the queue
-        frame = frames.get()
+        frame = frames.dequeue()
 
     print('All frames have been displayed. Imagine animating at 24fps for a living')
     # make sure we cleanup the windows, otherwise we might end up with a mess
